@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState,useEffect } from 'react'
 import './FarmerPopup.css'
 import { assets } from '../../assets/assets'
 import { useNavigate } from "react-router-dom";
@@ -24,6 +24,9 @@ const FarmerPopup = ({ setShowFarmer }) => {
 
     const navigate = useNavigate();
     const dispatch = useDispatch();
+
+  const { user, isLoading, isError, isSuccess, message } = useSelector((state) => state.auth)
+
 
     useEffect(() => {
 
@@ -66,22 +69,42 @@ const FarmerPopup = ({ setShowFarmer }) => {
     };
 
     const handleSubmit = async (e) => {
-        console.log(Email, UserName, Password, mobNo, Address);
+      
         e.preventDefault();
+
+        if (!UserName || !Address || !Email || !Password || !mobNo ) {
+            toast.error('All fields must be filled');
+            return;
+          }
+          if (!agreeToTerms) {
+            toast.error('Please agree to our terms!');
+            return;
+          }
+
+          if (isNaN(mobNo)) {
+            toast.error('Mobile number must be a number');
+            return;
+          }
+
+
         if (Password !== confirmPassword) {
             toast.error('Passwords do not match')
+            console.log(Password);
         }
         else {
             if (passwordStrength !== "strong") {
                 toast.error("Password should be strong");
+                console.log(passwordStrength);
                 return;
             }
             if (!agreeToTerms) {
                 toast.error("Please agree to terms and conditions");
+                console.log('agree')
                 return;
             }
             if (mobNo.length !== 10) {
                 toast.error("Mobile number should be 10 digits long");
+                console.log('mob');
                 return;
             }
 
@@ -93,6 +116,7 @@ const FarmerPopup = ({ setShowFarmer }) => {
                 Address: Address,
                 isVendor: false,
             };
+            // console.log(UserName,Email,mobNo,Password,Address);
             dispatch(register(formData));
 
 
@@ -100,7 +124,15 @@ const FarmerPopup = ({ setShowFarmer }) => {
     };
     const handleLogin = (e) => {
         e.preventDefault()
+        if (!Email || !Password) {
+            toast.error('All fields must be filled');
+            return;
+          }
 
+          if (!agreeToTerms) {
+            toast.error('Please agree to our terms!');
+            return;
+          }
         const userData = {
             Email,
             Password,
@@ -132,12 +164,27 @@ const FarmerPopup = ({ setShowFarmer }) => {
 
                     <input type="email" placeholder='Email Address' required onChange={(event) => setEmail(event.target.value)}
                         value={Email} />
-                    <input type="password" placeholder='Password' required onChange={(event) => setPassword(event.target.value)}
+                    <input type="password" placeholder='Password' required onChange={(event) => {setPassword(event.target.value)
+                    handlePasswordStrength(event);}}
                         value={Password} />
+                    
+                 
+                   { farmerState==='Sign Up'  &&<input type="password" placeholder=' Confirm Password' required onChange={(event) => {setConfrirmPassword(event.target.value);
+                     handleConfirmPassword(event);
+                    
+                    }}
+                        value={confirmPassword} />}
+                            {!validConfirmPassword && (
+                          <p className="password-strength weak">Passwords do not match</p>
+                        )}
                 </div>
                 <button onClick={farmerState === 'Sign Up' ? handleSubmit : handleLogin}>{farmerState === "Sign Up" ? "Create Account" : "Login"}</button>
                 <div className="farmer-popup-condition">
-                    <input type="checkbox" required />
+                    <input type="checkbox"     name="agreeToTerms"
+                        id="agree-to-terms"
+                        checked={agreeToTerms}
+                        onChange={() => setAgreeToTerms(!agreeToTerms)} // toggle the checkbox state
+                        required/>
                     <p>By continuing, I agree to the terms of use & privacy poilcy.</p>
                 </div>
                 {

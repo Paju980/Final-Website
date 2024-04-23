@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 import Navbar from './components/Navbar/Navbar'
 import { Route, Routes } from 'react-router-dom'
@@ -10,6 +11,7 @@ import Footer from './components/Footer/Footer'
 import LoginPopup from './components/LoginPopup/LoginPopup'
 import FarmerPopup from './components/FarmerPopup/FarmerPopup'
 import VendorPopup from './components/VendorPopup/VendorPopup'
+
 
 const App = () => {
 
